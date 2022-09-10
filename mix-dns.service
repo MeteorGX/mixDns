@@ -1,0 +1,23 @@
+# MixDns的系统服务
+# =================
+#
+# 管理局域网的DNS中心, 将打包的Jar包移动到 /data/build/mix-dns.jar
+# 系统服务文件放入 /etc/systemd/system 文件之中
+# 文件权限最好采用 chmod 755 /data/build/mix-dns.jar
+# 一般低于 1024 端口需要采用 root 权限才能占用
+#
+[Unit]
+Description=Dns System Manager
+After=network.target nss-lookup.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/java -jar /data/build/mix-dns.jar
+PrivateTmp=true
+User=root
+Group=root
+Restart=on-failure
+
+
+[Install]
+WantedBy=multi-user.target

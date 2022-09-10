@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>MixDns管理面板</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+
+
+    <!-- 引入Require.JS -->
+    <script type="text/javascript" src="/static/js/require.min.js"></script>
+    <script type="text/javascript" src="/static/js/require.config.js"></script>
+
+</head>
+<body>
+
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/">
+        <i class="bi bi-house"></i>
+        MixDns管理
+    </a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</header>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column" id="js-nav-tabs">
+
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#about" aria-current="page"
+                           aria-selected="true" href="javascript:void(0)">
+                            <span data-feather="about"></span>
+                            <i class="bi bi-people"></i>
+                            关于
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#search" aria-current="page"
+                           aria-selected="true" href="javascript:void(0)">
+                            <span data-feather="search"></span>
+                            <i class="bi bi-search"></i>
+                            DNS域名查询
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#log" aria-current="page"
+                           aria-selected="true" href="javascript:void(0)">
+                            <span data-feather="log"></span>
+                            <i class="bi bi-list"></i>
+                            DNS拦截解析日志
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#config" aria-current="page"
+                           aria-selected="true" href="javascript:void(0)">
+                            <span data-feather="config"></span>
+                            <i class="bi bi-gear"></i>
+                            DNS拦截解析配置
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+        </nav>
+
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 tab-content">
+
+
+            <!-- about begin -->
+            <div class="tab-pane active" id="about">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">关于</h1>
+                </div>
+
+                <div>
+                    <h5>开发者信息:</h5>
+                    <ul>
+                        <li class="text-start">作者: MeteorCat</li>
+                        <li class="text-start">邮箱: guixin2010@live.cn</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5>开源库支持:</h5>
+                    <ul>
+                        <li class="text-start"><a href="https://spring.io">SpringBoot2</a> 作为Web库( 最低基于 <span
+                                class="text-warning">Java11</span> )
+                        </li>
+                        <li class="text-start"><a href="https://v5.bootcss.com">BootstrapV5</a> 作为前端UI库</li>
+                        <li class="text-start"><a href="https://netty.io">Netty</a> 作为DNS网络服务层</li>
+
+                    </ul>
+                </div>
+
+                <div>
+                    <h5>环境说明:</h5>
+                    <ui>
+                        <li class="text-start">项目附带有内置 Systemd 系统注册脚本说明</li>
+                        <li class="text-start">默认的现代Linux发行版, 1024以下端口必须采用 <span class="text-warning">root</span>
+                            权限
+                        </li>
+                        <li class="text-start">WebUI项目默认对局域网开放, 默认访问端口为 <span class="text-warning">10053</span>
+                        </li>
+                    </ui>
+                </div>
+
+            </div>
+            <!-- about end -->
+
+
+            <!-- search begin -->
+            <div class="tab-pane" id="search">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">DNS域名查询</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="export-search-dns-btn">
+                                导出DNS信息
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <form>
+                    <div class="mb-3">
+                        <label for="inputHostname" class="form-label">域名地址</label>
+                        <input type="url" class="form-control" id="inputHostname" aria-describedby="域名"
+                               placeholder="www.meteorcat.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputHostnameList" class="form-label">解析结果</label>
+                        <textarea class="form-control" id="inputHostnameList" rows="8"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-primary float-end" id="search-dns-btn">请求</button>
+                </form>
+
+            </div>
+            <!-- search end -->
+
+
+            <!-- log begin -->
+            <div class="tab-pane" id="log">
+
+
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">DNS拦截解析日志</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="export-dns-log-btn">导出DNS信息</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                        <tr>
+                            <th scope="col">类型</th>
+                            <th scope="col">域名</th>
+                            <th scope="col">解析地址</th>
+                            <th scope="col">生成时间</th>
+                            <th scope="col">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="log-table"></tbody>
+                    </table>
+                </div>
+
+            </div>
+            <!-- log end -->
+
+
+            <!-- config begin -->
+            <div class="tab-pane" id="config">
+
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">DNS拦截解析配置</h1>
+                </div>
+
+
+                <form>
+                    <div class="mb-3">
+                        <label for="selectUpdateType" class="form-label">域名类型</label>
+                        <select class="form-control" id="selectUpdateType" aria-describedby="域名类型"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputUpdateHostname" class="form-label">域名地址</label>
+                        <input type="url" class="form-control" id="inputUpdateHostname" aria-describedby="域名"
+                               placeholder="www.meteorcat.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputUpdateAddress" class="form-label">域名地址</label>
+                        <input type="text" class="form-control" id="inputUpdateAddress" aria-describedby="IP地址"
+                               placeholder="127.0.0.1">
+                    </div>
+                    <button type="button" class="btn btn-primary float-end" id="update-dns-btn">更新解析</button>
+                </form>
+            </div>
+            <!-- config end -->
+
+        </main>
+    </div>
+</div>
+
+
+<script>
+
+    require(['bootstrap','jquery'],function(bs,$){
+
+        // 获取解析类型
+        $.post("/dns/types",{},function(response){
+            if(response.status === 0){
+                const rows = $('#selectUpdateType');
+                rows.children().remove();
+                const data = response.data || [];
+                let opts = "";
+                for (const row of data) {
+                    opts += `<option value="${row.id}">${row.name}</option>`;
+                }
+                rows.append(opts);
+            }else if(response.has("message")){
+                window.alert(response.message);
+            }else{
+                window.alert("服务器错误");
+            }
+        });
+
+
+        // 获取查询功能Nav
+        $('#search-dns-btn').click(function(){
+            const hostname = $('#inputHostname');
+            const hostnames = $('#inputHostnameList');
+            hostnames.val("");
+
+            $.post("/dns/query",{hostname:hostname.val()},function(response){
+                if(response.status === 0){
+                    let hosts = "";
+                    const data = response.data.address || [];
+                    for (const addr of data) {
+                        hosts += `${addr}\n`;
+                    }
+                    hostnames.val(hosts);
+                }else if(response.has("message")){
+                    window.alert(response.message);
+                }else{
+                    window.alert("服务器错误");
+                }
+            });
+        });
+
+        // 导出查询结果
+        $('#export-search-dns-btn').click(function(){
+            const hostnames = $('#inputHostnameList');
+            const hosts = hostnames.val();
+            if(hosts.length > 0){
+                const data = hosts.split("\n") || [];
+                let csv = '';
+                for (const v of data) {
+                    if(v.length > 0){
+                        csv += `${v}\t\n`;
+                    }
+                }
+
+                const link = document.createElement('a');
+                link.href = `data:text/csv;charset=utf-8,\ufeff`+encodeURIComponent(csv);
+                link.download = "导出数据.csv";
+                link.click();
+            }
+        });
+
+        // 获取拦截日志Nav
+        $('#js-nav-tabs a[data-bs-target="#log"]').click(function(){
+            const rows = $('#log-table');
+            rows.children().remove();
+
+            $.post("/dns/list",{},function(response){
+                if(response.status === 0){
+                    let row = "";
+                    const data = response.data || [];
+                    for (const line of data) {
+                        const removeNode = `<a class="js-remove-hostname" href="javascript:void(0)" data-hostname="${line.hostname}" data-type="${line.type}">删除</a>`;
+                        row += `<tr><td>${line.typeName}</td><td>${line.hostname}</td><td>${line.address}</td><td>${line.createDate}</td><td>${removeNode}</td></tr>`;
+                    }
+                    rows.append(row);
+
+                    // 重新绑定删除方法
+                    $('.js-remove-hostname').unbind("click").click(function(){
+                        const self = $(this);
+                        const hostname = self.data("hostname");
+                        const type = self.data("type");
+                        if(window.confirm("确认删除该记录?") === true){
+
+                            // 删除日志
+                            $.post("/dns/remove",{type:type,hostname:hostname},function(response){
+                                if(response.status === 0){
+                                    window.alert(response.message);
+                                    window.document.location.reload();
+                                }else{
+                                    window.alert("操作失败");
+                                }
+                            });
+
+                        }
+                    });
+
+                }else if(response.has("message")){
+                    window.alert(response.message);
+                }else{
+                    window.alert("服务器错误");
+                }
+            });
+
+        });
+
+        // 导出拦截结果
+        $('#export-dns-log-btn').click(function (){
+            const rows = $('#log-table');
+            const childrens = rows.find("tr");
+            if(childrens.length > 0){
+                let csv = "";
+                for (let i = 0; i < childrens.length; i++) {
+                    const row = childrens.get(i);
+                    const line = $(row);
+                    const type = line.find("td:eq(0)").text();
+                    const hostname = line.find("td:eq(1)").text();
+                    const address = line.find("td:eq(2)").text();
+                    const create = line.find("td:eq(3)").text();
+                    csv += `${type}\t,${hostname}\t,${address}\t,${create}\t\n`;
+                }
+                const link = document.createElement("a");
+                link.href = `data:text/csv;charset=utf-8,\ufeff`+encodeURIComponent(csv);
+                link.download = "导出数据.csv";
+                link.click();
+            }
+        });
+
+
+        // 配置DNS拦截地址
+        $('#update-dns-btn').click(function(){
+            const type = $('#selectUpdateType').val();
+            const hostname = $('#inputUpdateHostname').val();
+            const address = $('#inputUpdateAddress').val();
+            $.post("/dns/update",{type:type,hostname:hostname,address:address},function(response){
+                if(response.status === 0 || response.has("message")){
+                    window.alert(response.message);
+                }else{
+                    window.alert("服务器错误");
+                }
+            });
+        });
+
+    });
+
+
+</script>
+</body>
+</html>
