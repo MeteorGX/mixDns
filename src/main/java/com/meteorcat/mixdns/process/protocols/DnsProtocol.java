@@ -15,28 +15,20 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.dns.*;
-import io.netty.resolver.DefaultAddressResolverGroup;
-import io.netty.util.internal.SocketUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
  * @author MeteorCat
  */
+@Slf4j
 public class DnsProtocol extends SimpleChannelInboundHandler<DatagramDnsQuery> {
-
-    /**
-     * 日志句柄
-     */
-    private final static Logger logger = LoggerFactory.getLogger(DnsProtocol.class);
 
 
     /**
@@ -141,7 +133,7 @@ public class DnsProtocol extends SimpleChannelInboundHandler<DatagramDnsQuery> {
 
 
         // 确认是否为有效的DNS查询, 如果不是有效查询直接返回CONNECT REFUSED
-        // 后续不需要解析结果
+        // Todo: 可以作为系统默认黑名域名, 后续不需要解析结果
         if(!isValid(dnsQuestion)){
             response.setCode(DnsResponseCode.REFUSED);
             channelHandlerContext.writeAndFlush(response);
@@ -152,7 +144,7 @@ public class DnsProtocol extends SimpleChannelInboundHandler<DatagramDnsQuery> {
         DnsRecordType dnsRecordType = dnsQuestion.type();
         String dnsRecordName = dnsQuestion.name().toLowerCase();
         MixConfig config = BeanUtil.getBean(MixConfig.class);
-        logger.info("Received Dns Query[{}]: {}[ttl:{}]",dnsRecordType.name(),dnsRecordName,config.getTtl());
+        log.info("Received Dns Query[{}]: {}[ttl:{}]",dnsRecordType.name(),dnsRecordName,config.getTtl());
 
         // 本地拦截解析
         if((dnsRecordType.equals(DnsRecordType.A) || dnsRecordType.equals(DnsRecordType.AAAA))){
@@ -163,7 +155,7 @@ public class DnsProtocol extends SimpleChannelInboundHandler<DatagramDnsQuery> {
             if(exists.isPresent()){
                 DnsModel active = exists.get();
                 dnsRecordType = DnsRecordType.valueOf(active.getType());
-                logger.debug("Active Dns Query[{}]: {} -> {}",dnsRecordType,dnsRecordName,active.getBytes());
+                log.debug("Active Dns Query[{}]: {} -> {}",dnsRecordType,dnsRecordName,active.getBytes());
 
                 // 写入返回记录
                 response.addRecord(DnsSection.ANSWER, new DefaultDnsRawRecord(
@@ -184,7 +176,7 @@ public class DnsProtocol extends SimpleChannelInboundHandler<DatagramDnsQuery> {
         try{
             DnsResolver resolver = BeanUtil.getBean(DnsResolver.class);
             addresses = resolver.resolver(dnsRecordName);
-            logger.debug("Resolvers: {} -> {}",dnsRecordName,addresses);
+            log.debug("Resolvers: {} -> {}",dnsRecordName,addresses);
 
             if(addresses.isEmpty()){
                 response.setCode(DnsResponseCode.REFUSED);
@@ -200,7 +192,7 @@ public class DnsProtocol extends SimpleChannelInboundHandler<DatagramDnsQuery> {
             response.setCode(DnsResponseCode.NOERROR);
             channelHandlerContext.writeAndFlush(response);
         }catch (ExecutionException|InterruptedException exception){
-            logger.error(exception.toString());
+            log.error(exception.toString());
             response.setCode(DnsResponseCode.SERVFAIL);
             channelHandlerContext.writeAndFlush(response);
         }
@@ -210,6 +202,6 @@ public class DnsProtocol extends SimpleChannelInboundHandler<DatagramDnsQuery> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
-        logger.error(cause.toString());
+        log.error(cause.toString());
     }
 }

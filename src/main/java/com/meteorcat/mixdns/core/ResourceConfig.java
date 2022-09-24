@@ -5,6 +5,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
+ * 针对静态文件加载配置
  * @author MeteorCat
  */
 @Configuration
