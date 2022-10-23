@@ -57,4 +57,11 @@ public class MixConfig {
     private Integer resolveThread;
 
 
+    /**
+     * 处理解析DNS服务文件
+     */
+    @Getter
+    @Value("${mix.dns.resolve.file}")
+    private String resolveFile = "";
+
 }
